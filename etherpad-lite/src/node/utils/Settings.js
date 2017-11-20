@@ -91,7 +91,7 @@ exports.defaultPadText = "Welcome to Etherpad!\n\nThis pad text is synchronized 
 exports.padOptions = {
   "noColors": false,
   "showControls": true,
-  "showChat": true,
+  "showChat": false,
   "showLineNumbers": true,
   "useMonospaceFont": false,
   "userName": false,
@@ -106,12 +106,12 @@ exports.padOptions = {
  * Whether certain shortcut keys are enabled for a user in the pad
  */
 exports.padShortcutEnabled = {
-  "altF9" : true,
-  "altC" : true,
-  "delete" : true,
-  "cmdShift2" : true,
-  "return" : true,
-  "esc" : true,
+  "altF9" : false,
+  "altC" : false,
+  "delete" : false,
+  "cmdShift2" : false,
+  "return" : false,
+  "esc" : false,
   "cmdS" : true,
   "tab" : true,
   "cmdZ" : true,
@@ -120,12 +120,12 @@ exports.padShortcutEnabled = {
   "cmdI" : true,
   "cmdU" : true,
   "cmd5" : true,
-  "cmdShiftL" : true,
-  "cmdShiftN" : true,
-  "cmdShift1" : true,
-  "cmdShiftC" : true,
+  "cmdShiftL" : false,
+  "cmdShiftN" : false,
+  "cmdShift1" : false,
+  "cmdShiftC" : false,
   "cmdH" : true,
-  "ctrlHome" : true,
+  "ctrlHome" : false,
   "pageUp" : true,
   "pageDown" : true,
 },
@@ -459,13 +459,13 @@ exports.reloadSettings = function reloadSettings() {
     console.warn("Declaring the sessionKey in the settings.json is deprecated. This value is auto-generated now. Please remove the setting from the file.");
   }
 
-  if(exports.dbType === "dirty"){
-    var dirtyWarning = "DirtyDB is used. This is fine for testing but not recommended for production.";
-    if(!exports.suppressErrorsInPadText){
-      exports.defaultPadText = exports.defaultPadText + "\nWarning: " + dirtyWarning + suppressDisableMsg;
-    }
-    console.warn(dirtyWarning);
-  }
+  // if(exports.dbType === "dirty"){
+  //   var dirtyWarning = "DirtyDB is used. This is fine for testing but not recommended for production.";
+  //   if(!exports.suppressErrorsInPadText){
+  //     exports.defaultPadText = exports.defaultPadText + "\nWarning: " + dirtyWarning + suppressDisableMsg;
+  //   }
+  //   console.warn(dirtyWarning);
+  // }
 };
 
 // initially load settings

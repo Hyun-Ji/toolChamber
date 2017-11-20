@@ -1,10 +1,29 @@
-<html>
+<html xmlns='http://www.w3.org/1999/xhtml'>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>캔버스</title>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="js/board.js"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> <!--for draggable, resizable-->
+
+    <script>
+        $( function() {
+            $( "#image" ).draggable();
+            $( "#image" ).resizable();
+        } );
+    </script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="js/board.js"></script>
+
+    <style>
+        #image { width: 150px; height: 150px; background-color: aquamarine}
+    </style>
+
+    <!--script src="js/resize.js"></script-->
+
+    <!--
     <script src="https://rawgit.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
     <script src ="https://rawgit.com/eligrey/canvas-toBlob.js/master/canvas-toBlob.js"></script>
     <script>
@@ -15,34 +34,32 @@
                 saveAs(blob, "output.png");
             }, "image/png");
         };
-    </script>
+    </script>--> <!--save image for png jQuery-->
+
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 </head>
 <body>
 
-<canvas id = 'cv' width='860px;' height='645px;'></canvas>
+<div class="toolbar">
 
-<div class = "menu">
-    <button id = 'get' onClick=" ;">get</button>
-    <button id = 'clear'>clear</button>
-    <button id = 'save' onClick="save_image();">save</button>
+        <input type="radio" name ="tool" id='pen' value="pen" checked="on" onClick="tools(this.id);">펜
+        <input type="radio" name ="tool" id='eraser' value="eraser" onClick="tools(this.id);">지우개
 
-    <fieldset>
-        <legend>색상변경</legend>
-        <select id = 'pen_color'>
-        </select>
-    </fieldset>
-    <fieldset>
-        <legend>두께</legend>
-        <select id = 'pen_width'>
-        </select>
-    </fieldset>
-    <fieldset>
-        <legend>도형</legend>
-        <select id = 'draw_shape'>
-        </select>
-    </fieldset>
-</div>
+        <select id = 'pen_color'> </select>
+        <select id = 'pen_width'> </select>
+
+        <button id = 'clear'>clear</button>
+
+        <button id = 'get' onClick="load();">get</button>
+                <button id = 'save' onClick="save();">save</button>
+                <button id = 'undo' onClick="cUndo();">undo</button>
+                <button id = 'redo' onClick="cRedo();">redo</button>
+
+                <input type="file" id="getfile" accept="image/*">
+    </div>
+    <div>
+        <canvas id='cv'></canvas>
+    </div>
 
 </body>
 </html>

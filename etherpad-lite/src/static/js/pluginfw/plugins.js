@@ -88,7 +88,7 @@ exports.update = function (cb) {
       Object.keys(packages),
       function (plugin_name, cb) {
         loadPlugin(packages, plugin_name, plugins, parts, cb);
-      },                    //바깥 package.json에는 플러그인 이름이 없지..... 그래서 NULL이 뜨지..... 조금만 잤다가 여기서부터 다시하자 으앙 주금...
+      },
       function (err) {
         if (err) cb(err);
         exports.plugins = plugins;

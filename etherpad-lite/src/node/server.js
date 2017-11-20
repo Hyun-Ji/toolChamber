@@ -21,71 +21,65 @@
  * limitations under the License.
  */
 
+var log4js = require('log4js')
+  , async = require('async')
+  , stats = require('./stats')
+  ;
 
-exports.serverforDocs = function serverforDocs(){
+log4js.replaceConsole();
 
-    var log4js = require('log4js')
-        , async = require('async')
-        , stats = require('./stats')
-    ;
+stats.gauge('memoryUsage', function() {
+  return process.memoryUsage().rss
+})
 
-    log4js.replaceConsole();
+var settings
+  , db
+  , plugins
+  , hooks;
+var npm = require("npm/lib/npm.js");
 
-    stats.gauge('memoryUsage', function() {
-        return process.memoryUsage().rss
+async.waterfall([
+  // load npm
+  function(callback) {
+    npm.load({}, function(er) {
+      callback(er)
     })
+  },
 
-    var settings
-        , db
-        , plugins
-        , hooks;
+  // load everything
+  function(callback) {
+    settings = require('./utils/Settings');
+    db = require('./db/DB');
+    plugins = require("ep_etherpad-lite/static/js/pluginfw/plugins");
+    hooks = require("ep_etherpad-lite/static/js/pluginfw/hooks");
+    hooks.plugins = plugins;
+    callback();
+  },
 
-    var npm = require("npm/lib/npm.js");
+  //initalize the database
+  function (callback)
+  {
+    db.init(callback);
+  },
 
-    async.waterfall([
-        // load npm
-        function(callback) {
-            npm.load({}, function(er) {
-                callback(er)
-            })
-        },
+  function(callback) {
+    plugins.update(callback)
+  },
 
-        // load everything
-        function(callback) {
-            settings = require('./utils/Settings');
-            db = require('./db/DB');
-            plugins = require("ep_etherpad-lite/static/js/pluginfw/plugins");
-            hooks = require("ep_etherpad-lite/static/js/pluginfw/hooks");
-            hooks.plugins = plugins;
-            callback();
-        },
+  function (callback) {
+    console.info("Installed plugins: " + plugins.formatPluginsWithVersion());
+    console.debug("Installed parts:\n" + plugins.formatParts());
+    console.debug("Installed hooks:\n" + plugins.formatHooks());
 
-        //initalize the database
-        function (callback)
-        {
-            db.init(callback);
-        },
+    // Call loadSettings hook
+    hooks.aCallAll("loadSettings", { settings: settings });
+    callback();
+  },
 
-        function(callback) {
-            plugins.update(callback)
-        },
-
-        function (callback) {
-            console.info("Installed plugins: " + plugins.formatPluginsWithVersion());
-            console.debug("Installed parts:\n" + plugins.formatParts());
-            console.debug("Installed hooks:\n" + plugins.formatHooks());
-
-            // Call loadSettings hook
-            hooks.aCallAll("loadSettings", { settings: settings });
-            callback();
-        },
-
-        //initalize the http server
-        function (callback)
-        {
-            hooks.callAll("createServer", {});
-            callback(null);
-        }
-    ]);
-}
-
+  //initalize the http server
+  function (callback)
+  {
+    hooks.callAll("createServer", {});
+    callback(null);
+  }
+]);

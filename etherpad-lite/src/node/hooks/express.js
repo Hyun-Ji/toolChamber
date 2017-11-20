@@ -83,5 +83,5 @@ exports.restartServer = function () {
   hooks.callAll("expressConfigure", {"app": app});
   hooks.callAll("expressCreateServer", {"app": app, "server": server});
 
-  server.listen(settings.port, settings.ip); //리슨은 또 여기있네.....
+  server.listen(settings.port, settings.ip);
 }
