@@ -1,5 +1,6 @@
 var express = require('express');
-var path = require('path');
+var https = require('https');
+var fs = require('fs');
 var app = express();
 
 //app.set("view engine", "ejs");
@@ -11,8 +12,21 @@ app.get('/',function (req,res) {
 var userWholeList = [] //for chamber and user id
 var clients = []; //for get admin(방장), save socket id
 
-var server = app.listen(3001, function(){
-    console.log('3000번 포트로 서버를 시작합니다!, try at localhost:3000'); });
+var port = 3001;
+app.set('port', port);
+
+var options = {
+    key: fs.readFileSync('../cert/key.pem'),
+    cert: fs.readFileSync('../cert/cert.pem')
+};
+var server = https.createServer(options, app);
+server = server.listen(port, function () {
+    console.log('Canvas Server Start! https://localhost:3001');
+});
+
+
+// var server = app.listen(3001, function(){
+//     console.log('3000번 포트로 서버를 시작합니다!, try at localhost:3000'); });
 
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function (socket) {

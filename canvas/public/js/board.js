@@ -33,7 +33,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
     alert('The File APIs are not fully supported in this browser.');
 }
 
-socket = io.connect('http://' + window.location.host);
+socket = io.connect('https://' + window.location.host);
 socket.emit('joined', user_data);
 
 $(document).ready(function(){
