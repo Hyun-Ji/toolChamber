@@ -70,6 +70,17 @@ $(document).ready(function(){
 
     cPush(); //가장 처음 상태 저장
 
+    var button = document.getElementById('btn-download');
+    button.addEventListener('click', function (e) {
+        var now = new Date();
+        console.log(now.getYear());
+        var date = (now.getYear()-100).toString() + now.getMonth().toString() + now.getDate().toString()+ "-" + now.getHours() + now.getMinutes() + now.getSeconds();
+        var dataURL = c.toDataURL('image/png');
+        button.href = dataURL;
+        button.download = chamber + " " + date + ".png"
+    });
+
+    /*
     var file = document.querySelector('#getfile');
     var fileURL;
     if(file == null){
@@ -94,20 +105,25 @@ $(document).ready(function(){
         };
         console.log(this.value);
     };
+    */
 
-    // socket.on('changeUserState', function(userWholeList){
-    //     console.log("------------------------------------");
-    //     var i;
-    //     for(i=0; i<userWholeList.length; i++){
-    //         console.log(i+1 + "번째 참여자 : "+ userWholeList[i].user_id + " 의 색상은 " + userWholeList[i].user_color + "입니다."+"\n");
-    //     }
-    //     console.log("------------------------------------");
-    // });
-    //
-    // socket.on('SendRecentData', function(){
-    //     save();
-    //     load();
-    // });
+    socket.on('SendRecentData', function(){ //방에 가장 오래 있던 유저의 data 전송
+        var recentData = save();
+        socket.emit('recentData', recentData);
+        if(recentData) {
+            console.log("첫번째 유저가 데이터 보냄");
+        }
+    });
+
+    socket.on('getRecentData', function(recentData){ //방에 가장 나중에 들어온 유저는 data 전달 받음
+        var img = new Image();
+        img.src = recentData;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        };
+        console.log("마지막 유저가 데이터 받음");
+
+    });
 
     socket.on('linesend_toclient', function (data) { //데이터 전달 받음
         draw.drawfromServer(data);
@@ -134,7 +150,7 @@ function tools(value){
     }
 }
 
-function save(){
+function save(){ //단순히 클라이언트가 현재 캔버스의 dataURL을 리턴받는 함수
     save_src = c.toDataURL();
     //console.log(save_src);
     return save_src;
@@ -255,24 +271,24 @@ var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신�
     start : function(e){
         this.drawing = true;
         if(tool == "pen") {
-            //ctx.beginPath();
-            //ctx.moveTo(e.pageX, e.pageY-32);
+            ctx.beginPath();
+            ctx.moveTo(e.pageX, e.pageY-32);
             msg.line.send('start', e.pageX, e.pageY-32);
         }
         else{
-            //ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
+            ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
             msg.line.send('erase', e.pageX, e.pageY-32);
         }
     },
     move : function(e){
         if(this.drawing){
             if(tool == "pen") {
-                //ctx.lineTo(e.pageX, e.pageY-32);
-                //ctx.stroke();
+                ctx.lineTo(e.pageX, e.pageY-32);
+                ctx.stroke();
                 msg.line.send('move', e.pageX, e.pageY-32);
             }
             else{
-                //ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
+                ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
                 msg.line.send('erase', e.pageX, e.pageY-32);
             }
         }
@@ -280,13 +296,14 @@ var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신�
     end : function(e){
         this.drawing = false;
         msg.line.send('end');
+        cPush();
     },
     clear : function(){
         //전체 지우기
-        //ctx.clearRect(0, 0, cv.width,cv.height);
-        //shape.setShape();
+        ctx.clearRect(0, 0, cv.width,cv.height);
+        shape.setShape();
         msg.line.send('clear');
-        //cPush();
+        cPush();
     },
 
     //그린 내용 남의 브라우저에도 그려주기
@@ -305,8 +322,8 @@ var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신�
         }
 
         if(data.type == 'end'){
+            console.log("서버로부터 그려짐");
             cPush();
-            //ctx.strokeStyle = user_color;
         }
 
         if(data.type == 'clear'){
@@ -356,9 +373,24 @@ function cPush() {
 }
 
 function cUndo() { //When click undo
+    if (cStep > 0) {
+        cStep--;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () {
+            ctx.clearRect(0, 0, cv.width,cv.height);
+            ctx.drawImage(canvasPic, 0, 0);
+        }
+    }
     socket.emit('undo', user_data);
 }
 function cRedo() { //When click redo
+    if (cStep < cPushArray.length-1) {
+        cStep++;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    }
     socket.emit('redo', user_data);
 }
 
