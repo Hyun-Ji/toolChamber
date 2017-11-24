@@ -3,3 +3,4 @@
 node_modules
 cert
 canvas/node_modules
+etherpad-lite/setting.json

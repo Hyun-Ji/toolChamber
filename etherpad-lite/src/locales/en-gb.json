@@ -45,7 +45,7 @@
 	"pad.settings.fontType.monospaced": "Monospace",
 	"pad.settings.globalView": "Global View",
 	"pad.settings.language": "Language:",
-	"pad.importExport.import_export": "Import/Export",
+	"pad.importExport.import_export": "저장",
 	"pad.importExport.import": "Upload any text file or document",
 	"pad.importExport.importSuccessful": "Successful!",
 	"pad.importExport.export": "Export current pad as:",

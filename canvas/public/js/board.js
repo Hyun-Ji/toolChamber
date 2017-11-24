@@ -68,7 +68,7 @@ $(document).ready(function(){
     }
     $('select').bind('change',shape.change);
 
-    cPush(); //가장 처음 상태 저장
+    cPush(); //가장 처음 상태 Push
 
     var button = document.getElementById('btn-download');
     button.addEventListener('click', function (e) {
@@ -80,7 +80,6 @@ $(document).ready(function(){
         button.download = chamber + " " + date + ".png"
     });
 
-    /*
     var file = document.querySelector('#getfile');
     var fileURL;
     if(file == null){
@@ -105,7 +104,6 @@ $(document).ready(function(){
         };
         console.log(this.value);
     };
-    */
 
     socket.on('SendRecentData', function(){ //방에 가장 오래 있던 유저의 data 전송
         var recentData = save();
@@ -185,14 +183,10 @@ function drawfileonCanvas(fileURL){
         imageHeight = img.height;
 
         console.log(imageWidth + " , " + imageHeight);
-
-        //image resizing soon...
-
-        ctx.drawImage(img, 100, 100, 400, 400);
+        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
         //console.log(img.width);
     };
     img.src = dataURL;
-
     var data = {'type':"file", 'dataURL':dataURL};
 
     //여기 전에 모든 수정을 마치기..!
@@ -266,7 +260,7 @@ var shape = {
     }
 }
 //그리기
-var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신호만 보내기.
+var draw = {
     drawing : null,
     start : function(e){
         this.drawing = true;
@@ -276,7 +270,7 @@ var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신�
             msg.line.send('start', e.pageX, e.pageY-32);
         }
         else{
-            ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
+            ctx.clearRect(e.pageX-10, (e.pageY-32)-10, 20, 20);
             msg.line.send('erase', e.pageX, e.pageY-32);
         }
     },
@@ -288,7 +282,7 @@ var draw = {    //전체 broadcast형식으로 변경. 그림 그릴 때는 신�
                 msg.line.send('move', e.pageX, e.pageY-32);
             }
             else{
-                ctx.clearRect(e.pageX-10, e.pageY-10, 20, 20);
+                ctx.clearRect(e.pageX-10, (e.pageY-32)-10, 20, 20);
                 msg.line.send('erase', e.pageX, e.pageY-32);
             }
         }

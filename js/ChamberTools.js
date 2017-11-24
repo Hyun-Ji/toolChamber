@@ -1,12 +1,20 @@
 //
 var user_id = prompt("사용자 ID를 입력하세요", "default");
 var chamber_name = prompt("소속된 챔버명을 입력하세요", "redpoint");
+var user_color = prompt("이더패드에 사용할 유저 컬러를 입력하세요 으아아ㅏㅏㅏ호롤로");
+
+$(document).ready(function() {
+    var button = document.getElementById('btn-docs-download');
+    var FileDownLink = "https://localhost:9001/p/" + chamber_name + "/export/txt";
+    button.href = FileDownLink;
+
+});
 
 //calling canvas
 (function( $ ){
     $.fn.canvas = function() {
         var iFrameLink = '<iframe id="canvas"';
-            iFrameLink = iFrameLink + 'src="http://0.0.0.0:3000?chamber=' +chamber_name;
+            iFrameLink = iFrameLink + 'src="https://localhost:3001?chamber=' +chamber_name;
             iFrameLink = iFrameLink + '&userName=' + user_id;
             iFrameLink = iFrameLink +'" width="' + '100%';//settings.width;
             iFrameLink = iFrameLink +'" height="' + '100%;';//settings.height;
@@ -26,24 +34,10 @@ var chamber_name = prompt("소속된 챔버명을 입력하세요", "redpoint");
     $.fn.pad = function( options ) {
         var settings = {
             //'host'              : 'http://beta.etherpad.org',
-            'host'              : 'http://0.0.0.0:9001',
+            'host'              : 'https://localhost:9001',
             'baseUrl'           : '/p/',
-            'showControls'      : true,
-            'showChat'          : false,
-            'showLineNumbers'   : true,
             'userName'          : user_id,
-            'lang'              : '',
-            'useMonospaceFont'  : false,
-            'noColors'          : false,
-            'userColor'         : true,
-            'hideQRCode'        : false,
-            'alwaysShowChat'    : false,
-            'border'            : 0,
-            'borderStyle'       : 'solid',
-            'toggleTextOn'      : 'Disable Rich-text',
-            'toggleTextOff'     : 'Enable Rich-text',
-            'plugins'           : {},
-            'rtl'               : false,
+            'userColor'         : user_color,
             'padId'             : chamber_name    };
 
         var $self = this;
@@ -67,46 +61,16 @@ var chamber_name = prompt("소속된 챔버명을 입력하세요", "redpoint");
             var iFrameLink = '<iframe id="'+epframeId;
             iFrameLink = iFrameLink +'" name="' + epframeId;
             iFrameLink = iFrameLink +'" src="' + settings.host+settings.baseUrl+settings.padId;
-            iFrameLink = iFrameLink + '?showControls=' + settings.showControls;
-            iFrameLink = iFrameLink + '&showChat=' + settings.showChat;
-            iFrameLink = iFrameLink + '&showLineNumbers=' + settings.showLineNumbers;
-            iFrameLink = iFrameLink + '&useMonospaceFont=' + settings.useMonospaceFont;
             iFrameLink = iFrameLink + '&userName=' + settings.userName;
-            if (settings.lang) {
-                iFrameLink = iFrameLink + '&lang=' + settings.lang;
-            }
-            iFrameLink = iFrameLink + '&noColors=' + settings.noColors;
             iFrameLink = iFrameLink + '&userColor=' + settings.userColor;
-            iFrameLink = iFrameLink + '&hideQRCode=' + settings.hideQRCode;
-            iFrameLink = iFrameLink + '&alwaysShowChat=' + settings.alwaysShowChat;
-            iFrameLink = iFrameLink + '&rtl=' + settings.rtl;
-            iFrameLink = iFrameLink + pluginParams;
-            iFrameLink = iFrameLink +'" style="border:' + settings.border;
-            iFrameLink = iFrameLink +'; border-style:' + settings.borderStyle;
-            iFrameLink = iFrameLink +';" width="' + '100%';//settings.width;
-            iFrameLink = iFrameLink +'" height="' + '100%;';//settings.height;
+            iFrameLink = iFrameLink +'" width="' + '100%';
+            iFrameLink = iFrameLink +'" height="' + '100%;';
             iFrameLink = iFrameLink +'"></iframe>';
 
+            //var FileDownLink = '<iframe src="https://localhost:9001/p/' + settings.padId + '/export/txt"></iframe>'
 
             var $iFrameLink = $(iFrameLink);
-
-            if (useValue) {
-                var $toggleLink = $('<a href="#'+ selfId +'">'+ settings.toggleTextOn +'</a>').click(function(){
-                    var $this = $(this);
-                    $this.toggleClass('active');
-                    if ($this.hasClass('active')) $this.text(settings.toggleTextOff);
-                    $self.pad({getContents: false});
-                    return false;
-                });
-                $self
-                    .hide()
-                    .after($toggleLink)
-                    .after($iFrameLink)
-                ;
-            }
-            else {
-                $self.html(iFrameLink);
-            }
+            $self.html(iFrameLink);
         }
 
         // This reads the etherpad contents if required
@@ -134,4 +98,14 @@ var chamber_name = prompt("소속된 챔버명을 입력하세요", "redpoint");
     };
 })( jQuery );
 
-//calling canvas
+(function( $ ){
+    $.fn.download = function() {
+        var FileDownLink = '<iframe src="https://localhost:9001/p/' + chamber_name + '/export/txt"></iframe>'
+        var $FileDownLink = $(FileDownLink);
+
+        var $self = this;
+        $self.html(FileDownLink);
+    };
+
+    return;
+})( jQuery );
